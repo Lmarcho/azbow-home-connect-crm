@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\ReservationController;
-
+use App\Http\Controllers\PropertyController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,4 +34,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/reservations/{reservation}/approve-financials', [ReservationController::class, 'approveFinancials']); // Approve Financials
     Route::put('/reservations/{reservation}/finalize-legal', [ReservationController::class, 'finalizeLegal']); // Finalize Legal
     Route::get('/reservations', [ReservationController::class, 'index']); // Retrieve Reservations
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/properties', [PropertyController::class, 'store']); // Create Property
+    Route::get('/properties', [PropertyController::class, 'index']); // Retrieve Properties
+    Route::put('/properties/{property}', [PropertyController::class, 'update']); // Update Property
+    Route::delete('/properties/{property}', [PropertyController::class, 'destroy']); // Delete Property
 });
