@@ -49,7 +49,7 @@ class ReservationController extends Controller
             'reservation_fee' => $request->reservation_fee,
             'financial_status' => 'Pending',
             'legal_status' => 'Pending',
-            'sale_status' => 'Pending',
+            'sale_status' => 'Reserved',
         ]);
 
         $lead->update(['status' => 'Reserved']);
