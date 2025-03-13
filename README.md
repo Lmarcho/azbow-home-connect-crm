@@ -41,15 +41,17 @@ This API follows best REST practices and uses Laravel Sanctum for authentication
    ```
 5. Run database migrations:
    ```bash
-   php artisan migrate
+   php artisan migrate --seed
    ```
 6. Serve the application:
    ```bash
    php artisan serve
    ```
 
-## Authentication
-Authentication is handled via Laravel Sanctum. To obtain a Bearer Token, users must first register and log in.
+## Authentication & User Roles
+Authentication is handled via Laravel Sanctum. There are two user roles:
+- **Admin**: Can manage properties, assign leads, approve financials, and finalize legal processes.
+- **Sales Agent**: Can create leads, progress leads, and create reservations.
 
 ### Register User
 ```bash
@@ -58,9 +60,10 @@ POST /api/register
 Request Body:
 ```json
 {
-  "name": "Lakshitha Mathngadeera",
-  "email": "lmathngadeera@gmail.com",
-  "password": "password123"
+  "name": "John Doe",
+  "email": "johndoe@example.com",
+  "password": "password123",
+  "role": "admin" // or "sales_agent"
 }
 ```
 
@@ -88,24 +91,24 @@ Authorization: Bearer your-generated-token
 
 ## API Endpoints
 ### Leads
-- **Create Lead**: `POST /api/leads`
-- **Assign Lead**: `PUT /api/leads/{lead_id}/assign`
-- **Progress Lead**: `PUT /api/leads/{lead_id}/progress`
-- **Cancel Lead**: `PUT /api/leads/{lead_id}/cancel`
-- **Get Lead by ID**: `GET /api/leads/{lead_id}`
-- **Get All Leads**: `GET /api/leads`
+- **Create Lead** (Sales Agent): `POST /api/leads`
+- **Assign Lead** (Admin): `PUT /api/leads/{lead_id}/assign`
+- **Progress Lead** (Sales Agent): `PUT /api/leads/{lead_id}/progress`
+- **Cancel Lead** (Sales Agent): `PUT /api/leads/{lead_id}/cancel`
+- **Get Lead by ID** (Sales Agent/Admin): `GET /api/leads/{lead_id}`
+- **Get All Leads** (Admin): `GET /api/leads`
 
 ### Reservations
-- **Create Reservation**: `POST /api/reservations`
-- **Approve Financials**: `PUT /api/reservations/{reservation_id}/approve-financials`
-- **Finalize Legal**: `PUT /api/reservations/{reservation_id}/finalize-legal`
-- **Get Reservations**: `GET /api/reservations?financial_status=Approved`
+- **Create Reservation** (Sales Agent): `POST /api/reservations`
+- **Approve Financials** (Admin): `PUT /api/reservations/{reservation_id}/approve-financials`
+- **Finalize Legal** (Admin): `PUT /api/reservations/{reservation_id}/finalize-legal`
+- **Get Reservations** (Sales Agent/Admin): `GET /api/reservations?financial_status=Approved`
 
 ### Properties
-- **Create Property**: `POST /api/properties`
-- **Update Property**: `PUT /api/properties/{property_id}`
-- **Delete Property**: `DELETE /api/properties/{property_id}`
-- **Get Properties**: `GET /api/properties?status=Available`
+- **Create Property** (Admin): `POST /api/properties`
+- **Update Property** (Admin): `PUT /api/properties/{property_id}`
+- **Delete Property** (Admin): `DELETE /api/properties/{property_id}`
+- **Get Properties** (Sales Agent/Admin): `GET /api/properties?status=Available`
 
 ## Testing
 ### Run PHPUnit Tests
