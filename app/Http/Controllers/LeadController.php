@@ -125,11 +125,17 @@ class LeadController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Get a Single Lead by ID
      */
     public function show(string $id)
     {
-        //
+        $lead = Lead::with(['agent', 'reservations', 'statusLogs'])->find($id);
+
+        if (!$lead) {
+            return response()->json(['error' => 'Lead not found'], 404);
+        }
+
+        return response()->json($lead);
     }
 
     /**

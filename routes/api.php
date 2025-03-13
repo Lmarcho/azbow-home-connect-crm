@@ -37,6 +37,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/leads/{lead}/progress', [LeadController::class, 'progress']); // Progress Lead
     Route::put('/leads/{lead}/cancel', [LeadController::class, 'cancel']); // Cancel Lead
     Route::get('/leads', [LeadController::class, 'index']); // Retrieve Leads
+    Route::get('/leads/{id}', [LeadController::class, 'show']); // Get Lead by ID
+
 
     //Reservation Management APIs
     Route::post('/reservations', [ReservationController::class, 'store']); // Create Reservation
