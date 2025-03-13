@@ -19,7 +19,7 @@ return new class extends Migration
             $table->decimal('reservation_fee', 10, 2)->nullable();
             $table->enum('financial_status', ['Pending', 'Approved', 'Rejected'])->default('Pending');
             $table->enum('legal_status', ['Pending', 'Finalized'])->default('Pending');
-            $table->enum('sale_status', ['Pending', 'Sold'])->default('Pending');
+            $table->enum('sale_status', ['Pending', 'Reserved', 'Sold'])->default('Pending');
             $table->timestamps();
         });
     }

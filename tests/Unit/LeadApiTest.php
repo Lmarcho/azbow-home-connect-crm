@@ -63,4 +63,50 @@ class LeadApiTest extends TestCase
             'changed_by' => $user->id
         ]);
     }
+
+    public function test_lead_creation_fails_without_source()
+    {
+        $user = User::factory()->create(['role' => 'sales_agent']);
+        Sanctum::actingAs($user);
+
+        $response = $this->postJson('/api/leads', [
+            'name' => 'Test Lead',
+            'contact_info' => 'test@example.com'
+        ]);
+
+        $response->assertStatus(422) // Expect Validation Error
+        ->assertJsonValidationErrors(['source']);
+    }
+
+    public function test_unassigned_lead_cannot_be_progressed()
+    {
+        $user = User::factory()->create(['role' => 'sales_agent']);
+        Sanctum::actingAs($user);
+
+        $lead = Lead::factory()->create(['status' => 'Unassigned']);
+
+        $response = $this->putJson("/api/leads/{$lead->id}/progress");
+
+        $response->assertStatus(403)
+            ->assertJson(['error' => 'Unauthorized']);
+    }
+
+    public function test_lead_cannot_be_assigned_twice()
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        Sanctum::actingAs($admin);
+
+        $agent = User::factory()->create(['role' => 'sales_agent']);
+        $lead = Lead::factory()->create(['status' => 'Assigned', 'assigned_agent_id' => $agent->id]);
+
+        $response = $this->putJson("/api/leads/{$lead->id}/assign", [
+            'assigned_agent_id' => $agent->id
+        ]);
+
+        $response->assertStatus(400)
+            ->assertJson(['error' => 'Only unassigned leads can be assigned']);
+    }
+
+
+
 }
