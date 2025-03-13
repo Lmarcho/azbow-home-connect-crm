@@ -19,7 +19,7 @@ class ReservationFactory extends Factory
             'reservation_fee' => $this->faker->numberBetween(1000, 10000),
             'financial_status' => 'Pending',
             'legal_status' => 'Pending',
-            'sale_status' => $this->faker->randomElement(['Pending', 'Reserved', 'Completed']),
+            'sale_status' => $this->faker->randomElement(['Pending', 'Reserved', 'Sold']),
         ];
     }
 }
