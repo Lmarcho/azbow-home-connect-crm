@@ -26,6 +26,11 @@ class PropertyController extends Controller
      */
     public function store(Request $request)
     {
+        //  Only Admins Can Create Properties
+        if (!auth()->user()->isAdmin()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
         $request->validate([
             'location' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
@@ -42,6 +47,12 @@ class PropertyController extends Controller
      */
     public function destroy(Property $property)
     {
+
+        //  Only Admins Can Delete Properties
+        if (!auth()->user()->isAdmin()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
         if ($property->status !== 'Available') {
             return response()->json(['error' => 'Only available properties can be deleted'], 400);
         }

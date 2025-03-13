@@ -63,6 +63,11 @@ class ReservationController extends Controller
      */
     public function approveFinancials(Request $request, Reservation $reservation)
     {
+        //  Only Admins Can Approve Financials
+        if (!auth()->user()->isAdmin()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
         if ($reservation->financial_status !== 'Pending') {
             return response()->json(['error' => 'Financial status is already processed'], 400);
         }
@@ -88,6 +93,10 @@ class ReservationController extends Controller
      */
     public function finalizeLegal(Request $request, Reservation $reservation)
     {
+        if (!auth()->user()->isAdmin()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
         if ($reservation->financial_status !== 'Approved') {
             return response()->json(['error' => 'Financials must be approved before finalizing legal process'], 400);
         }

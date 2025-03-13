@@ -19,38 +19,47 @@ use App\Http\Controllers\AuthController;
 |
 */
 
-// Authentication Routes (Register, Login, Logout)
-Route::post('/register', [AuthController::class, 'register']); // User Registration
-Route::post('/login', [AuthController::class, 'login']); // User Login
+//  Public Authentication Routes (Register, Login)
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
 
-
+//  Protected Routes (Require Authentication)
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
 
-    Route::post('/logout', [AuthController::class, 'logout']); // User Logout
+    Route::post('/logout', [AuthController::class, 'logout']);
 
-    //Lead Management APIs
-    Route::post('/leads', [LeadController::class, 'store']); // Create Lead
-    Route::put('/leads/{lead}/assign', [LeadController::class, 'assign']); // Assign Lead
-    Route::put('/leads/{lead}/progress', [LeadController::class, 'progress']); // Progress Lead
-    Route::put('/leads/{lead}/cancel', [LeadController::class, 'cancel']); // Cancel Lead
-    Route::get('/leads', [LeadController::class, 'index']); // Retrieve Leads
-    Route::get('/leads/{id}', [LeadController::class, 'show']); // Get Lead by ID
     Route::get('/leads/{lead_id}/status-logs', [LeadStatusLogController::class, 'index']);
 
+    //  Sales Agent Routes (Manage Leads & Create Reservations)
+    Route::middleware('role:sales_agent')->group(function () {
+        Route::post('/leads', [LeadController::class, 'store']); // Create Lead
+        Route::put('/leads/{lead}/progress', [LeadController::class, 'progress']); // Progress Lead
+        Route::put('/leads/{lead}/cancel', [LeadController::class, 'cancel']); // Cancel Lead
+        Route::get('/leads', [LeadController::class, 'index']); // Retrieve Leads
+        Route::get('/leads/{id}', [LeadController::class, 'show']); // Get Lead by ID
+        Route::get('/leads/{lead_id}/status-logs', [LeadStatusLogController::class, 'index']); // Lead Status Logs
 
-    //Reservation Management APIs
-    Route::post('/reservations', [ReservationController::class, 'store']); // Create Reservation
-    Route::put('/reservations/{reservation}/approve-financials', [ReservationController::class, 'approveFinancials']); // Approve Financials
-    Route::put('/reservations/{reservation}/finalize-legal', [ReservationController::class, 'finalizeLegal']); // Finalize Legal
-    Route::get('/reservations', [ReservationController::class, 'index']); // Retrieve Reservations
+        // Reservation Management (Agents Create Reservations)
+        Route::post('/reservations', [ReservationController::class, 'store']);
+        Route::get('/reservations', [ReservationController::class, 'index']); // Retrieve Reservations
+    });
 
-    //Property Management APIs
-    Route::post('/properties', [PropertyController::class, 'store']); // Create Property
-    Route::get('/properties', [PropertyController::class, 'index']); // Retrieve Properties
-    Route::put('/properties/{property}', [PropertyController::class, 'update']); // Update Property
-    Route::delete('/properties/{property}', [PropertyController::class, 'destroy']); // Delete Property
+    //  Admin Routes (Lead Assignment, Approvals, Property Management)
+    Route::middleware('role:admin')->group(function () {
+        // Lead Assignment (Only Admins Can Assign Leads)
+        Route::put('/leads/{lead}/assign', [LeadController::class, 'assign']);
+
+        // Reservation Approval (Admins Only)
+        Route::put('/reservations/{reservation}/approve-financials', [ReservationController::class, 'approveFinancials']);
+        Route::put('/reservations/{reservation}/finalize-legal', [ReservationController::class, 'finalizeLegal']);
+
+        // Property Management (Admins Only)
+        Route::post('/properties', [PropertyController::class, 'store']);
+        Route::put('/properties/{property}', [PropertyController::class, 'update']);
+        Route::delete('/properties/{property}', [PropertyController::class, 'destroy']);
+    });
 });

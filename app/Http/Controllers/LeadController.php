@@ -53,19 +53,29 @@ class LeadController extends Controller
      */
         public function assign(Request $request, Lead $lead)
     {
+        //  Only Admins Can Assign Leads
+        if (!auth()->user()->isAdmin()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
         if ($lead->status !== 'Unassigned') {
             return response()->json(['error' => 'Only unassigned leads can be assigned'], 400);
         }
 
         $request->validate(['assigned_agent_id' => 'required|exists:users,id']);
 
-        $lead->update(['assigned_agent_id' => $request->assigned_agent_id, 'status' => 'Assigned']);
+        $lead->update([
+            'assigned_agent_id' => $request->assigned_agent_id,
+            'status' => 'Assigned'
+        ]);
 
+        // Log the status change
         LeadStatusLog::create([
             'lead_id' => $lead->id,
             'previous_status' => 'Unassigned',
             'new_status' => 'Assigned',
-            'changed_by' => Auth::id(),
+            'changed_by' => auth()->id(),
+            'changed_at' => now(),
         ]);
 
         return response()->json(['message' => 'Lead assigned successfully', 'lead' => $lead]);
@@ -76,6 +86,11 @@ class LeadController extends Controller
      */
     public function progress(Request $request, Lead $lead)
     {
+        // Only Assigned Sales Agent Can Progress Their Own Lead
+        if (auth()->id() !== $lead->assigned_agent_id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
         $validTransitions = [
             'Assigned' => 'Reserved',
             'Reserved' => 'Financial Approved',
@@ -89,7 +104,7 @@ class LeadController extends Controller
 
         $newStatus = $validTransitions[$lead->status];
 
-        //Save status change in LeadStatusLog table
+        // Log status change in LeadStatusLog
         LeadStatusLog::create([
             'lead_id' => $lead->id,
             'previous_status' => $lead->status,
@@ -98,10 +113,10 @@ class LeadController extends Controller
             'changed_at' => now(),
         ]);
 
+        //  Update the lead status
         $lead->update(['status' => $newStatus]);
 
         return response()->json(['message' => "Lead moved to $newStatus", 'lead' => $lead]);
-
     }
 
 
