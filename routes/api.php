@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LeadController;
+use App\Http\Controllers\LeadStatusLogController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\AuthController;
@@ -38,6 +39,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/leads/{lead}/cancel', [LeadController::class, 'cancel']); // Cancel Lead
     Route::get('/leads', [LeadController::class, 'index']); // Retrieve Leads
     Route::get('/leads/{id}', [LeadController::class, 'show']); // Get Lead by ID
+    Route::get('/leads/{lead_id}/status-logs', [LeadStatusLogController::class, 'index']);
 
 
     //Reservation Management APIs

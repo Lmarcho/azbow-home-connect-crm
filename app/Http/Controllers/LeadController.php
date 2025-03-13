@@ -88,16 +88,20 @@ class LeadController extends Controller
         }
 
         $newStatus = $validTransitions[$lead->status];
-        $lead->update(['status' => $newStatus]);
 
+        //Save status change in LeadStatusLog table
         LeadStatusLog::create([
             'lead_id' => $lead->id,
             'previous_status' => $lead->status,
             'new_status' => $newStatus,
-            'changed_by' => Auth::id(),
+            'changed_by' => auth()->id(),
+            'changed_at' => now(),
         ]);
 
+        $lead->update(['status' => $newStatus]);
+
         return response()->json(['message' => "Lead moved to $newStatus", 'lead' => $lead]);
+
     }
 
 
