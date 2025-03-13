@@ -6,6 +6,8 @@ use Tests\TestCase;
 use App\Models\Reservation;
 use App\Models\User;
 use Laravel\Sanctum\Sanctum;
+use App\Models\Lead;
+use App\Models\Property;
 
 class ReservationApiTest extends TestCase
 {
@@ -14,9 +16,19 @@ class ReservationApiTest extends TestCase
         $user = User::factory()->create();
         Sanctum::actingAs($user);
 
+        // Create a test lead & property
+        $lead = Lead::factory()->create([
+            'status' => 'Unassigned'
+        ]);
+
+        // Assign the lead to an agent before reservation
+        $lead->update(['status' => 'Assigned']);
+
+        $property = Property::factory()->create();
+
         $response = $this->postJson('/api/reservations', [
-            'lead_id' => 1,
-            'property_id' => 2,
+            'lead_id' => $lead->id,
+            'property_id' => $property->id,
             'reservation_fee' => 5000
         ]);
 
