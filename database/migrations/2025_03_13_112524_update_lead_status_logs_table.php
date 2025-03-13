@@ -12,7 +12,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('lead_status_logs', function (Blueprint $table) {
-            $table->timestamps(); // ✅ Adds created_at and updated_at columns
+            $table->timestamps(); // Adds created_at and updated_at columns
         });
     }
 

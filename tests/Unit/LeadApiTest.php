@@ -96,7 +96,7 @@ class LeadApiTest extends TestCase
         $user = User::factory()->create(['role' => 'admin']);
         Sanctum::actingAs($user);
 
-        // ✅ Ensure the lead is assigned to the test user
+        // Ensure the lead is assigned to the test user
         $lead = Lead::factory()->create(['assigned_agent_id' => $user->id]);
 
         $response = $this->getJson("/api/leads/{$lead->id}");
@@ -110,7 +110,7 @@ class LeadApiTest extends TestCase
         $user = User::factory()->create(['role' => 'sales_agent']);
         Sanctum::actingAs($user);
 
-        // ✅ Ensure the lead is assigned to the test user
+        // Ensure the lead is assigned to the test user
         $lead = Lead::factory()->create([
             'status' => 'Assigned',
             'assigned_agent_id' => $user->id
@@ -121,7 +121,7 @@ class LeadApiTest extends TestCase
         $response->assertStatus(200)
             ->assertJson(['message' => 'Lead moved to Reserved']);
 
-        // ✅ Verify LeadStatusLog entry
+        // Verify LeadStatusLog entry
         $this->assertDatabaseHas('lead_status_logs', [
             'lead_id' => $lead->id,
             'previous_status' => 'Assigned',

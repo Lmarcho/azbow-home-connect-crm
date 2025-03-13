@@ -16,7 +16,7 @@ class ReservationApiTest extends TestCase
         $agent = User::factory()->create(['role' => 'sales_agent']);
         Sanctum::actingAs($agent);
 
-        // ✅ Ensure the lead is assigned to the sales agent
+        // Ensure the lead is assigned to the sales agent
         $lead = Lead::factory()->create(['assigned_agent_id' => $agent->id, 'status' => 'Assigned']);
 
         $property = Property::factory()->create();

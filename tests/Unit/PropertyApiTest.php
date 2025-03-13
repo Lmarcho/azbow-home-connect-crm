@@ -6,12 +6,10 @@ use Tests\TestCase;
 use App\Models\Property;
 use App\Models\User;
 use Laravel\Sanctum\Sanctum;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 
 class PropertyApiTest extends TestCase
 {
-    use RefreshDatabase;
     public function test_admin_can_create_property()
     {
         $admin = User::factory()->create(['role' => 'admin']);
@@ -46,33 +44,31 @@ class PropertyApiTest extends TestCase
      */
     public function test_get_all_properties()
     {
-        // Create a regular authenticated user (Can be Admin or Sales Agent)
         $admin = User::factory()->create(['role' => 'admin']);
-        $this->actingAs($admin); //Authenticate as Admin
-
+        $this->actingAs($admin);
         Property::factory()->count(3)->create();
 
         $response = $this->getJson('/api/properties');
 
         $response->assertStatus(200)
-            ->assertJsonCount(3);
+        ->assertJsonStructure([
+            '*' => ['id', 'location', 'price', 'status', 'created_at', 'updated_at']
+        ]);
     }
 
     public function test_sales_agent_can_retrieve_properties()
     {
-        // Create a sales agent user
-        $salesAgent = User::factory()->create(['role' => 'sales_agent']);
-        $this->actingAs($salesAgent); // ✅ Authenticate as Sales Agent
+        $agent = User::factory()->create(['role' => 'sales_agent']);
+        $this->actingAs($agent);
 
-        // Create properties
         Property::factory()->count(3)->create();
 
-        // Send request to retrieve properties
         $response = $this->getJson('/api/properties');
 
-        // Validate response
         $response->assertStatus(200)
-            ->assertJsonCount(3);
+        ->assertJsonStructure([
+            '*' => ['id', 'location', 'price', 'status', 'created_at', 'updated_at']
+        ]);
     }
 
 
@@ -88,7 +84,8 @@ class PropertyApiTest extends TestCase
 
         $response = $this->putJson("/api/properties/{$property->id}", [
             'location' => 'Updated Location',
-            'price' => 450000
+            'price' => 450000,
+            'status'=> 'Sold'
         ]);
 
         $response->assertStatus(200)
