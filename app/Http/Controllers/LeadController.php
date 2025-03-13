@@ -157,6 +157,34 @@ class LeadController extends Controller
         return response()->json($lead);
     }
 
+    public function qualifyLead(Request $request, Lead $lead)
+    {
+        // Ensure only the assigned Sales Agent can update lead qualification
+        if (auth()->id() !== $lead->assigned_agent_id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        // Validate Input
+        $request->validate([
+            'budget' => 'nullable|numeric|min:1000',
+            'location_preference' => 'nullable|string|max:255',
+            'property_interests' => 'nullable|string',
+        ]);
+
+        // Update Lead Details
+        $lead->update([
+            'budget' => $request->budget,
+            'location_preference' => $request->location_preference,
+            'property_interests' => $request->property_interests,
+        ]);
+
+        return response()->json([
+            'message' => 'Lead qualification updated successfully',
+            'lead' => $lead
+        ]);
+    }
+
+
     /**
      * Update the specified resource in storage.
      */

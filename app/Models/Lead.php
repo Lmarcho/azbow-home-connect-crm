@@ -16,6 +16,9 @@ class Lead extends Model
         'inquiry_date',
         'status',
         'assigned_agent_id',
+        'budget',
+        'location_preference',
+        'property_interests'
     ];
 
     public function agent()

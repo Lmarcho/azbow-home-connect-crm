@@ -23,6 +23,9 @@ use App\Http\Controllers\AuthController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+// Public API for lead capture (Anyone can create a lead)
+Route::post('/leads', [LeadController::class, 'store']); // Create Lead
+
 //  Protected Routes (Require Authentication)
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -32,16 +35,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    Route::get('/leads/{lead_id}/status-logs', [LeadStatusLogController::class, 'index']);
-
     //  Sales Agent Routes (Manage Leads & Create Reservations)
     Route::middleware('role:sales_agent')->group(function () {
-        Route::post('/leads', [LeadController::class, 'store']); // Create Lead
         Route::put('/leads/{lead}/progress', [LeadController::class, 'progress']); // Progress Lead
         Route::put('/leads/{lead}/cancel', [LeadController::class, 'cancel']); // Cancel Lead
         Route::get('/leads', [LeadController::class, 'index']); // Retrieve Leads
         Route::get('/leads/{id}', [LeadController::class, 'show']); // Get Lead by ID
-        Route::get('/leads/{lead_id}/status-logs', [LeadStatusLogController::class, 'index']); // Lead Status Logs
+        Route::put('/leads/{lead}/qualify', [LeadController::class, 'qualifyLead']); // Add Qualification API
 
         // Reservation Management (Agents Create Reservations)
         Route::post('/reservations', [ReservationController::class, 'store']);
@@ -50,8 +50,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //  Admin Routes (Lead Assignment, Approvals, Property Management)
     Route::middleware('role:admin')->group(function () {
-        // Lead Assignment (Only Admins Can Assign Leads)
-        Route::put('/leads/{lead}/assign', [LeadController::class, 'assign']);
+        Route::put('/leads/{lead}/assign', [LeadController::class, 'assign']);  // Lead Assignment (Only Admins Can Assign Leads)
+        Route::get('/leads', [LeadController::class, 'index']); // Retrieve Leads
+        Route::get('/leads/{id}', [LeadController::class, 'show']); // Get Lead by ID
+        Route::get('/leads/{lead_id}/status-logs', [LeadStatusLogController::class, 'index']); // Lead Status Logs
 
         // Reservation Approval (Admins Only)
         Route::put('/reservations/{reservation}/approve-financials', [ReservationController::class, 'approveFinancials']);
