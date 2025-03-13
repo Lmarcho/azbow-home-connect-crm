@@ -63,19 +63,37 @@ class PropertyController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Retrieve a single property by ID
      */
-    public function show(string $id)
+    public function show($id)
     {
-        //
+        $property = Property::find($id);
+
+        if (!$property) {
+            return response()->json(['error' => 'Property not found'], 404);
+        }
+
+        return response()->json($property);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update an existing property (Admin Only)
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Property $property)
     {
-        //
+        if (!auth()->user()->isAdmin()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $request->validate([
+            'location' => 'nullable|string|max:255',
+            'price' => 'nullable|numeric|min:0',
+            'status' => 'nullable|in:Available,Reserved,Sold',
+        ]);
+
+        $property->update($request->only(['location', 'price', 'status']));
+
+        return response()->json(['message' => 'Property updated successfully', 'property' => $property]);
     }
 
 }

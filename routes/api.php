@@ -35,6 +35,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout']);
 
+    Route::get('/properties', [PropertyController::class, 'index']); // Retrieve Properties
+
+
     //  Sales Agent Routes (Manage Leads & Create Reservations)
     Route::middleware('role:sales_agent')->group(function () {
         Route::put('/leads/{lead}/progress', [LeadController::class, 'progress']); // Progress Lead
