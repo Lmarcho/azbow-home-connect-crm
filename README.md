@@ -118,7 +118,7 @@ php artisan test
 ```
 
 ### Postman Testing
-- Import the provided Postman Collection
+- Import the provided Postman Collection (https://galactic-meadow-609781.postman.co/workspace/New-Team-Workspace~a467983c-0618-4b9c-ab9e-aa13ece5a40e/collection/39907580-d41ba7c2-1e70-458e-a435-4fd1aeae6161?action=share&creator=39907580)
 - Use a Bearer Token for authentication in requests
 - Verify API responses match expected formats
 
