@@ -110,6 +110,7 @@ Authorization: Bearer your-generated-token
 - **Delete Property** (Admin): `DELETE /api/properties/{property_id}`
 - **Get Properties** (Sales Agent/Admin): `GET /api/properties?status=Available`
 
+### API Documentation : View Postman Documentation (https://documenter.getpostman.com/view/39907580/2sAYkAP2Xb)
 ## Testing
 ### Run PHPUnit Tests
 Execute unit tests with:
